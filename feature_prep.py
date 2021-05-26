@@ -100,15 +100,7 @@ def engineer_origination_feature(ddf):
                       LOG_UPB=log_UPB.astype('float32')
                     )
 
-
-def write_to_parquet(ddf, ouput_path):
-    """
-    take in the dask dataframe after feature engineering and write to a parquet file 
-
-    :param ddf: the dask dataframe after feature engineering
-    """
-    ddf.to_parquet(output_path)
-    
+# run the following code line by line in interactive python on EC2
 
 if __name__ == '__main__':
     ddf = read_origination(os.path.join(data_path, 'historical_data_2009Q1.txt'))

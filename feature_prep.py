@@ -5,7 +5,7 @@ The first part: preprocess and feature engineer
 Author: Jasmine Guan and Sheng Yang
 """
 
-# testing locally 
+# all things test on EC2! Good to go! (THIS LINE TO BE REMOVED)
 import os 
 import dask.dataframe as dd
 import dask.array as da

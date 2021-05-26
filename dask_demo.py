@@ -10,3 +10,4 @@ from time import time, sleep
 # inside the python shell on ssh
 import dask.dataframe as dd 
 from distributed import Client 
+client = Client()

@@ -1,2 +1,6 @@
 # ignore file: facilitate testing locally 
 data/
+
+# python
+.vscode
+__pycache__

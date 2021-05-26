@@ -68,7 +68,7 @@ def preprocess_origination(ddf):
                        ]
     # preprocess numeric and boolean columns 
     ddf_num_processed = ddf_dropna.assign(
-        CREDIT_SCORE=((ddf['CREDIT_SCORE'] - 301) / (850 - 301)).astype('float16'),  # don't need many spaces
+        CREDIT_SCORE=((ddf['CREDIT_SCORE'] - 301) / (850 - 301)).astype('float32'),  # don't need many spaces
         FIRST_TIME_HOMEBUYER_FLAG=ddf['FIRST_TIME_HOMEBUYER_FLAG'].apply(lambda x: x == 'Y', meta=('int')),
         HARP_INDICATOR=ddf['HARP_INDICATOR'].apply(lambda x: x == 'Y', meta=('int'))
     )
@@ -97,7 +97,7 @@ def engineer_origination_feature(ddf):
     log_UPB = da.log(ddf['ORIGINAL_UPB'])
     
     return ddf.assign(LOG_RATE_PROD_TERM=log_rate_prod_term.astype('float64'), 
-                      LOG_UPB=log_UPB.astype('float16')
+                      LOG_UPB=log_UPB.astype('float32')
                     )
 
 

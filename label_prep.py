@@ -116,6 +116,8 @@ def main():
     # write to parquet (overwrite)
     is_delinquent.write.format('parquet').mode('overwrite').save(output_path)
 
+    spark.stop()
+
 
 if __name__ == '__main__':
     main()

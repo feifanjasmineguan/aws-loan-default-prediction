@@ -1,7 +1,8 @@
 """
-feature_prep.py
+This file remove missing rows, preprocess nominal and numerical columns, 
+and perform feature engineering on the origination dataset on an 
+EC2 instance. 
 
-The first part: preprocess and feature engineer
 Author: Jasmine Guan and Sheng Yang
 """
 

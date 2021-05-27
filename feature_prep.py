@@ -8,7 +8,7 @@ Author: Jasmine Guan and Sheng Yang
 
 # all things test on EC2! Good to go! (THIS LINE TO BE REMOVED)
 import os 
-import multiprocessing as mp
+# import multiprocessing as mp
 from distributed import Client
 import dask.dataframe as dd
 import dask.array as da
@@ -126,7 +126,7 @@ def main():
     ddf = read_origination(os.path.join(data_path, 'historical_data_2009Q1.txt'))
     ddf_dropna = drop_missing_origination(ddf)  # drop missing data
 
-    # TODO: parallelize preprocess and feature engineering
+    # TODO: parallelize preprocess and feature engineering, maybe?
     ddf_preprocessed = preprocess_origination(ddf_dropna).drop(columns=['ORIGINAL_UPB'])
     ddf_engineered = engineer_origination_feature(ddf_dropna)
     dd.concat([ddf_preprocessed, ddf_engineered], axis=1, ignore_unknown_divisions=True).to_parquet('output/')

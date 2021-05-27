@@ -5,3 +5,7 @@ output/
 # python
 .vscode
 __pycache__
+
+# testing files 
+test*
+dask-worker-space/

@@ -6,7 +6,6 @@ EC2 instance.
 Author: Jasmine Guan and Sheng Yang
 """
 
-# all things test on EC2! Good to go! (THIS LINE TO BE REMOVED)
 import os 
 # import multiprocessing as mp
 from distributed import Client
@@ -16,6 +15,7 @@ from dask_ml.preprocessing import OneHotEncoder
 
 # constants
 data_path = 'data/historical_data_2009Q1'
+output_path = 'output/feature'
 
 # features to use 
 # TODO: do we need to add more?
@@ -113,11 +113,11 @@ def initialize_client():
     """ initialize client """
     client = Client()
 
-def wrap_preprocess(ddf, q):
-    q.put(preprocess_origination(ddf))
+# def wrap_preprocess(ddf, q):
+#     q.put(preprocess_origination(ddf))
 
-def wrap_engineer(ddf, q):
-    q.put(engineer_origination_feature(ddf))
+# def wrap_engineer(ddf, q):
+#     q.put(engineer_origination_feature(ddf))
 
 def main():
     """
@@ -127,9 +127,14 @@ def main():
     ddf_dropna = drop_missing_origination(ddf)  # drop missing data
 
     # TODO: parallelize preprocess and feature engineering, maybe?
+    # preprocess and feature engineering
     ddf_preprocessed = preprocess_origination(ddf_dropna).drop(columns=['ORIGINAL_UPB'])
     ddf_engineered = engineer_origination_feature(ddf_dropna)
-    dd.concat([ddf_preprocessed, ddf_engineered], axis=1, ignore_unknown_divisions=True).to_parquet('output/')
+    # combine and write to parquet
+    dd.concat([ddf_preprocessed, ddf_engineered], 
+              axis=1, 
+              ignore_unknown_divisions=True
+    ).to_parquet(output_path)
 
 
 # run the following code line by line in interactive python on EC2

@@ -8,6 +8,8 @@ Author: Jasmine Guan and Sheng Yang
 
 # all things test on EC2! Good to go! (THIS LINE TO BE REMOVED)
 import os 
+import multiprocessing as mp
+from distributed import Client
 import dask.dataframe as dd
 import dask.array as da
 from dask_ml.preprocessing import OneHotEncoder
@@ -49,29 +51,36 @@ def read_origination(file_path):
     return ddf.rename(columns=dict(zip(ddf.columns, feature_name)))  # change name
      
 
-def preprocess_origination(ddf):
+def drop_missing_origination(ddf):
     """
-    preprocess: remove missing entries, scale numeric data, convert booleans,
+    remove missing entires
+
+    :param ddf: the dask dataframe read in 
+    """
+    # TODO: do we need to impute any of these or other columns?
+    return ddf.loc[(ddf['CREDIT_SCORE'] <= 850) &
+                   (ddf['CREDIT_SCORE'] >= 301) &
+                   (ddf['FIRST_TIME_HOMEBUYER_FLAG'] != '9') &
+                   (ddf['NUMBER_OF_UNITS'] < 5) &
+                   (ddf['OCCUPANCY_STATUS'] != '9') &
+                   (ddf['DTI'] != 999) &
+                   (ddf['CHANNEL'] != '9') &
+                   (ddf['LOAN_PURPOSE'] != '9')
+                   ]
+
+
+def preprocess_origination(ddf_dropna):
+    """
+    preprocess: scale numeric data, convert booleans,
     and one hot encode nominal data 
     
     :param ddf: the dask dataframe read in
     """
-    # drop missing values 
-    # TODO: do we need to impute any of these or other columns?
-    ddf_dropna = ddf.loc[(ddf['CREDIT_SCORE'] <= 850) &
-                       (ddf['CREDIT_SCORE'] >= 301) &
-                       (ddf['FIRST_TIME_HOMEBUYER_FLAG'] != '9') &
-                       (ddf['NUMBER_OF_UNITS'] < 5) &
-                       (ddf['OCCUPANCY_STATUS'] != '9') &
-                       (ddf['DTI'] != 999) &
-                       (ddf['CHANNEL'] != '9') & 
-                       (ddf['LOAN_PURPOSE'] != '9')
-                       ]
     # preprocess numeric and boolean columns 
     ddf_num_processed = ddf_dropna.assign(
-        CREDIT_SCORE=((ddf['CREDIT_SCORE'] - 301) / (850 - 301)).astype('float32'),  # don't need many spaces
-        FIRST_TIME_HOMEBUYER_FLAG=ddf['FIRST_TIME_HOMEBUYER_FLAG'].apply(lambda x: x == 'Y', meta=('int')),
-        HARP_INDICATOR=ddf['HARP_INDICATOR'].apply(lambda x: x == 'Y', meta=('int'))
+        CREDIT_SCORE=((ddf_dropna['CREDIT_SCORE'] - 301) / (850 - 301)).astype('float32'),  # don't need many spaces
+        FIRST_TIME_HOMEBUYER_FLAG=ddf_dropna['FIRST_TIME_HOMEBUYER_FLAG'].apply(lambda x: x == 'Y', meta=('int')),
+        HARP_INDICATOR=ddf_dropna['HARP_INDICATOR'].apply(lambda x: x == 'Y', meta=('int'))
     )
 
     # preprocess nominal columns 
@@ -84,27 +93,47 @@ def preprocess_origination(ddf):
     return ddf_proprocessed.drop(columns=nom_cols)
     
 
-def engineer_origination_feature(ddf):
+def engineer_origination_feature(ddf_dropna):
     """
-    perform feature engineering on the preprocessed dataframe 
+    perform feature engineering on the dropna dataframe 
     TODO: add comments on what columns to transform
 
-    :param ddf: the preprocessed dask dataframe 
+    :param ddf_dropna: the dask dataframe with missing value dropped
     """
     # log product of interest rate and loan term 
-    log_rate_prod_term = da.log(ddf['ORIGINAL_INTEREST_RATE'] / 100 + 1) * ddf['ORIGINAL_LOAN_TERM']
-
+    log_rate_prod_term = da.log(ddf_dropna['ORIGINAL_INTEREST_RATE'] / 100 + 1) * ddf_dropna['ORIGINAL_LOAN_TERM']
+    log_rate_prod_term.name = 'LOG_RATE_PROD_TERM'  # renaming for appending 
     # log scaled UPB 
-    log_UPB = da.log(ddf['ORIGINAL_UPB'])
+    log_UPB = da.log(ddf_dropna['ORIGINAL_UPB'])
     
-    return ddf.assign(LOG_RATE_PROD_TERM=log_rate_prod_term.astype('float32'), 
-                      LOG_UPB=log_UPB.astype('float32')
-                    )
+    return dd.concat([log_rate_prod_term, log_UPB], axis=1, ignore_unknown_divisions=True)
+
+
+def initialize_client():
+    """ initialize client """
+    client = Client()
+
+def wrap_preprocess(ddf, q):
+    q.put(preprocess_origination(ddf))
+
+def wrap_engineer(ddf, q):
+    q.put(engineer_origination_feature(ddf))
+
+def main():
+    """
+    wrap the entire process 
+    """
+    ddf = read_origination(os.path.join(data_path, 'historical_data_2009Q1.txt'))
+    ddf_dropna = drop_missing_origination(ddf)  # drop missing data
+
+    # TODO: parallelize preprocess and feature engineering
+    ddf_preprocessed = preprocess_origination(ddf_dropna).drop(columns=['ORIGINAL_UPB'])
+    ddf_engineered = engineer_origination_feature(ddf_dropna)
+    dd.concat([ddf_preprocessed, ddf_engineered], axis=1, ignore_unknown_divisions=True).to_parquet('output/')
+
 
 # run the following code line by line in interactive python on EC2
 
 if __name__ == '__main__':
-    ddf = read_origination(os.path.join(data_path, 'historical_data_2009Q1.txt'))
-    ddf_preprocessed = preprocess_origination(ddf)   # preprocess 
-    ddf_engineered = engineer_origination_feature(ddf_preprocessed)  # feature engineering 
-    ddf_engineered.to_parquet('output/')
+    initialize_client()
+    main()

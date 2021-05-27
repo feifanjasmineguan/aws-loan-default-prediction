@@ -4,7 +4,7 @@ On an EMR, label the monthly performance data using Spark
 Author: Jasmine Guan and Sheng Yang
 """
 
-# testing locally ...
+# TODO: test on EMR
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import collect_set, udf
@@ -71,6 +71,7 @@ def assign_label(df):
                                  '_c8 as ZERO_BALANCE_CODE']
                                 )
 
+    # TODO: find an optimize way to extract T/F instead of using collect_set (if we have time)
     # check individual column: collect set and then aggregate
     is_delinquent_raw = relevant_df.groupby('LOAN_SEQUENCE_NUMBER').agg(
         collect_set('CURRENT_LOAN_DELINQUENCY_STATUS').alias(

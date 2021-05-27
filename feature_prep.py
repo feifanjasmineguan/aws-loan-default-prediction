@@ -96,7 +96,7 @@ def engineer_origination_feature(ddf):
     # log scaled UPB 
     log_UPB = da.log(ddf['ORIGINAL_UPB'])
     
-    return ddf.assign(LOG_RATE_PROD_TERM=log_rate_prod_term.astype('float64'), 
+    return ddf.assign(LOG_RATE_PROD_TERM=log_rate_prod_term.astype('float32'), 
                       LOG_UPB=log_UPB.astype('float32')
                     )
 

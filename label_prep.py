@@ -4,15 +4,16 @@ On an EMR, label the monthly performance data using Spark
 Author: Jasmine Guan and Sheng Yang
 """
 
-# TODO: test on EMR
+# EMR tested fine! 
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import collect_set, udf
 from pyspark.sql.types import BooleanType
 
-# constants 
-data_path = 'data/historical_data_2009Q1'
-output_path = 'output/label'
+# IO paths
+s3_bucket = 's3://ds102-bubbletea-scratch'
+data_path = os.path.join(s3_bucket, 'historical_data_2009Q1')
+output_path = os.path.join(s3_bucket, 'output/label.parquet')
 
 
 def read_monthly_performance(spark, file_path):
@@ -112,8 +113,8 @@ def main():
     # assign label 
     is_delinquent = assign_label(df)
 
-    # write to parquet 
-    is_delinquent.write.parquet(output_path)
+    # write to parquet (overwrite)
+    is_delinquent.write.format('parquet').mode('overwrite').save(output_path)
 
 
 if __name__ == '__main__':

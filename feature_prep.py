@@ -15,7 +15,7 @@ from dask_ml.preprocessing import OneHotEncoder
 
 # constants
 data_path = 'data/historical_data_2009Q1'
-output_path = 'output/feature'
+output_path = 'output/feature.parquet'
 
 # features to use 
 # TODO: do we need to add more?
@@ -134,7 +134,7 @@ def main():
     dd.concat([ddf_preprocessed, ddf_engineered], 
               axis=1, 
               ignore_unknown_divisions=True
-    ).to_parquet(output_path)
+    ).to_parquet(output_path, overwrite=True)
 
 
 # run the following code line by line in interactive python on EC2

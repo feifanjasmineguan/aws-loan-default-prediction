@@ -7,7 +7,6 @@ sudo apt-get install python3-venv
 # install python virtual enviroment 
 python3 -m venv env
 source env/bin/activate
-pip install s3fs  # remote access s3 from python
 pip install pyarrow  # for recording parquet
 pip install "dask[complete]" --no-cache-dir
 pip install "dask-ml[xgboost]" --no-cache-dir   # also install xgboost and dask-xgboost

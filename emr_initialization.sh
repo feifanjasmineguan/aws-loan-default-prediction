@@ -1,4 +1,3 @@
-# TODO: to be filled
 # instruction for setting up EMR
 # Step 1: create EMR cluster on AWS web UI --- configure detail
     # Release Label: emr-6.2.0
@@ -8,6 +7,3 @@
 # Step 3: upload .py file to s3 bucket for faster EMR step
 # Step 4: run file as an EMR step
     # add step --> step type: Spark Application --> Application Location: choose .py file
-
-
-

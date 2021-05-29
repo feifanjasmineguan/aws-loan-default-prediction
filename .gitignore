@@ -7,5 +7,6 @@ output/
 __pycache__
 
 # testing files 
+dask_demo.py
 test*
 dask-worker-space/

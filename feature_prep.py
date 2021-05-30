@@ -16,7 +16,7 @@ from dask_ml.preprocessing import OneHotEncoder
 # IO paths
 s3_bucket = 's3://ds102-bubbletea-scratch'
 data_path = os.path.join(s3_bucket, 'historical_data_2009Q1')
-output_path = os.path.join(s3_bucket, 'output/feature.parquet')
+output_path = os.path.join(s3_bucket, 'preprocess/feature.parquet')
 
 # features to use 
 # TODO: do we need to add more?

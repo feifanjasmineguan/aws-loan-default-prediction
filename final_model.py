@@ -18,8 +18,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 # data import: load parquet file from feature_prep.py & label_prep.py
-feature_ddf = dd.read_parquet("output/feature.parquet/part*").compute()
-label_ddf = dd.read_parquet("output/label.parquet/part*").compute()
+feature_ddf = dd.read_parquet("preprocess/feature.parquet/part*").compute()
+label_ddf = dd.read_parquet("preprocess/label.parquet/part*").compute()
 joined_ddf = feature_ddf.merge(label_ddf, on = "LOAN_SEQUENCE_NUMBER", how = "inner").compute()
 X = joined_ddf.drop("label", axis = 1)
 y = joined_ddf[["label"]]

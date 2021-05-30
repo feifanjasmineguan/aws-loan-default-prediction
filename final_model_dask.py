@@ -1,24 +1,30 @@
 """
-Final Model pandas version 
+Final Model: for learning purpose (dask version)
 
 Author: Jasmine Guan and Sheng Yang
 """
 
 # load packages
 import os
-import pandas as pd
+from dask.distributed import Client
 import matplotlib.pyplot as plt
 from sklearn.metrics import f1_score, plot_confusion_matrix
-from sklearn.model_selection import train_test_split  # dask version
-from sklearn.decomposition import PCA
+import dask.dataframe as dd
+from dask_ml.model_selection import train_test_split  # dask version
+from dask_ml.xgboost import XGBClassifier
+from dask_ml.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-
 
 # IO paths 
-feature_path = "preprocess/feature.parquet/"
-label_path = "preprocess/label.parquet/"
-output_path = 'output'
+feature_path = "preprocess/feature.parquet/part*"
+label_path = "preprocess/label.parquet/part*"
+output_path = 'output_dask'
+
+
+def initialize_client():
+    """ initialize client """
+    client = Client()
+    return client
 
 
 def read_feature_and_label():
@@ -26,12 +32,12 @@ def read_feature_and_label():
     read in the prepcrocessed feature and label dataset, and return X and Y 
     """
     # data import: load parquet file from feature_prep.py & label_prep.py
-    feature_ddf = pd.read_parquet(feature_path)
-    label_ddf = pd.read_parquet(label_path)
+    feature_ddf = dd.read_parquet(feature_path)
+    label_ddf = dd.read_parquet(label_path)
     # merge upon the unique identifier LoAN_SEQUENCE_NUMBER
     joined_ddf = feature_ddf.merge(label_ddf, on="LOAN_SEQUENCE_NUMBER", how="inner")
-    X = joined_ddf.drop(columns=['LOAN_SEQUENCE_NUMBER', 'HARP_INDICATOR', 'label'])
-    y = joined_ddf["label"]
+    X = joined_ddf.drop(columns=['LOAN_SEQUENCE_NUMBER', 'HARP_INDICATOR', 'label']).to_dask_array(lengths=True)
+    y = joined_ddf["label"].to_dask_array(lengths=True)  # resolves chunksize issue
     return X, y
 
 
@@ -129,8 +135,10 @@ def log_confusion_matrix(mdl_name, mdl, X_test, y_test):
 
 def main():
     """
-    wrap all things into main 
+    wrap all processes 
     """
+    # initialize client
+    initialize_client()
     # load features
     X, y = read_feature_and_label()
 

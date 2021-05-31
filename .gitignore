@@ -1,6 +1,6 @@
 # ignore file: facilitate testing locally 
 data/
-output/
+preprocess/
 
 # python
 .vscode

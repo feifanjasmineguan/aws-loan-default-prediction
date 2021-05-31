@@ -1,0 +1,10 @@
+Logistic Regression
+train_score: 0.9750006596132028
+test_score: 0.9744280360454647
+f1: 0.0
+
+XGBoost
+train_score: 0.975043534471386
+test_score: 0.9744819041609272
+f1: 0.0
+

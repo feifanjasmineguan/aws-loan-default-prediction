@@ -13,7 +13,7 @@ from pyspark.sql.types import BooleanType
 # IO paths
 s3_bucket = 's3://ds102-bubbletea-scratch'
 data_path = os.path.join(s3_bucket, 'historical_data_2009Q1')
-output_path = os.path.join(s3_bucket, 'output/label.parquet')
+output_path = os.path.join(s3_bucket, 'preprocess/label.parquet')
 
 
 def read_monthly_performance(spark, file_path):

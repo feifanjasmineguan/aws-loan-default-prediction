@@ -1,0 +1,30 @@
+# discussion on configuration 
+
+EC2 Configuration: 
+OS: Ubuntu Server 20.04 LTS (HVM), SSD Volume Type, 64 bits 
+pick t2.xlarge (4 cores, 16 GB memory)
+enable spot instance with 0.07 max price 
+and leave all others as default. 
+
+EMR Configuration: 
+Pick software release emr-6.2, and select Spark 3.0.1 as shown; 
+3 compute instances: one master and 2 slaves, all are of the type m5.xlarge,
+keep everything else as default (no need to add EBS, as we directly communicate with S3 in EMR)
+
+Tradeoffs: 
+- Cost vs computational capacity: increasing the number of cores or the memory of each core costs more per minute 
+but the time the compute instance needs to be up is shortened due to more computational capacity. For general purposes,
+t2.xlarge is good enough; 
+- Stability vs peak demand: enabling spot instance allows AWS to shut down the compute instance the the current 
+computation exceed some predetermined demand (measured by dollar), while it substantially costs less. For most cases 
+enabling spot instance could help cut the cost since there is little risk that the demand spikes; 
+- Picking EC2 vs picking EMR: EMR is suitable for highly parallelizable tasks, but also harder to utilize its full capacity 
+for developers. On the other hand EC2 is simpler to use and easier to exploit its full capacity, as developers have 
+been quite familiar with tunning cores in a single compute instance. For pedagogical purposes, we have used both. 
+
+To handle larger dataset: 
+- If the program is read/write intensive, add more EBS capacity to store temporary data to reduce IO cost when communicating with S3;
+- If needed, pick configurations with more cores or more memory, or both;
+- If needed, disable spot instance if one is sure that the program will last for longer than 24 hours will 
+highly likely exceed prescribed demand;
+- If needed, pick EMR to parallelize data processing to save time.

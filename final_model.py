@@ -134,16 +134,23 @@ def main():
     # load features
     X, y = read_feature_and_label()
 
-    # clear file
-    with open(os.path.join(output_path, 'accuracy_report.txt'), 'w') as f:
-        f.write('')
+
+
+
+# 
+# data import: load parquet file from feature_prep.py & label_prep.py
+feature_ddf = pd.read_parquet("output/feature.parquet/part*").compute()
+label_ddf = pd.read_parquet("output/label.parquet/part*").compute()
+joined_ddf = feature_ddf.merge(label_ddf, on = "LOAN_SEQUENCE_NUMBER", how = "inner").compute()
+X = joined_ddf.drop("label", axis = 1).compute()
+y = joined_ddf[["label"]].compute()
 
     # split and pca
-    X_train, X_test, y_train, y_test = split_and_pca(X, y)
+X_train, X_test, y_train, y_test = split_and_pca(X, y)
 
     # train and test on different models and record performances
-    lr_train_test(X_train, X_test, y_train, y_test)
-    xgb_train_test(X_train, X_test, y_train, y_test)
+lr_train_test(X_train, X_test, y_train, y_test)
+xgb_train_test(X_train, X_test, y_train, y_test)
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@ data_path = os.path.join(s3_bucket, 'historical_data_2009Q1')
 output_path = os.path.join(s3_bucket, 'preprocess/feature.parquet')
 
 # features to use 
+# TODO: DELETE ALL TODOS
 # TODO: do we need to add more?
 feature_cols_idx = [0, 2, 6, 7, 9, 10, 12, 13, 19, 20, 21, 28]
 feature_name = ['CREDIT_SCORE', 
@@ -113,12 +114,6 @@ def engineer_origination_feature(ddf_dropna):
 def initialize_client():
     """ initialize client """
     client = Client()
-
-# def wrap_preprocess(ddf, q):
-#     q.put(preprocess_origination(ddf))
-
-# def wrap_engineer(ddf, q):
-#     q.put(engineer_origination_feature(ddf))
 
 def main():
     """

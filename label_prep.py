@@ -72,7 +72,6 @@ def assign_label(df):
                                  '_c8 as ZERO_BALANCE_CODE']
                                 )
 
-    # TODO: find an optimize way to extract T/F instead of using collect_set (if we have time)
     # check individual column: collect set and then aggregate
     is_delinquent_raw = relevant_df.groupby('LOAN_SEQUENCE_NUMBER').agg(
         collect_set('CURRENT_LOAN_DELINQUENCY_STATUS').alias(

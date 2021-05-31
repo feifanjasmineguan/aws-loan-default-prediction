@@ -19,8 +19,6 @@ data_path = os.path.join(s3_bucket, 'historical_data_2009Q1')
 output_path = os.path.join(s3_bucket, 'preprocess/feature.parquet')
 
 # features to use 
-# TODO: DELETE ALL TODOS
-# TODO: do we need to add more?
 feature_cols_idx = [0, 2, 6, 7, 9, 10, 12, 13, 19, 20, 21, 28]
 feature_name = ['CREDIT_SCORE', 
                 'FIRST_TIME_HOMEBUYER_FLAG', 
@@ -59,7 +57,6 @@ def drop_missing_origination(ddf):
 
     :param ddf: the dask dataframe read in 
     """
-    # TODO: do we need to impute any of these or other columns?
     return ddf.loc[(ddf['CREDIT_SCORE'] <= 850) &
                    (ddf['CREDIT_SCORE'] >= 301) &
                    (ddf['FIRST_TIME_HOMEBUYER_FLAG'] != '9') &
@@ -98,7 +95,9 @@ def preprocess_origination(ddf_dropna):
 def engineer_origination_feature(ddf_dropna):
     """
     perform feature engineering on the dropna dataframe 
-    TODO: add comments on what columns to transform
+    We engineered two columns: 
+    - take into the account interest rate compounded across the entire loan term;
+    - log scaled UPB to suppress extreme inputs
 
     :param ddf_dropna: the dask dataframe with missing value dropped
     """
@@ -122,7 +121,6 @@ def main():
     ddf = read_origination(os.path.join(data_path, 'historical_data_2009Q1.txt'))
     ddf_dropna = drop_missing_origination(ddf)  # drop missing data
 
-    # TODO: parallelize preprocess and feature engineering, maybe?
     # preprocess and feature engineering
     ddf_preprocessed = preprocess_origination(ddf_dropna).drop(columns=['ORIGINAL_UPB'])
     ddf_engineered = engineer_origination_feature(ddf_dropna)

@@ -44,9 +44,9 @@ def split_and_pca(X, y):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, shuffle=True)
     # PCA 
-    pca = PCA(n_components=5).fit(X_train)
-    X_train = pca.transform(X_train)
-    X_test = pca.transform(X_test)
+    # pca = PCA(n_components=5).fit(X_train)
+    # X_train = pca.transform(X_train)
+    # X_test = pca.transform(X_test)
     return X_train, X_test, y_train, y_test
     
 

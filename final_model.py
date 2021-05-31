@@ -21,8 +21,8 @@ from sklearn.linear_model import LogisticRegression
 feature_ddf = dd.read_parquet("output/feature.parquet/part*").compute()
 label_ddf = dd.read_parquet("output/label.parquet/part*").compute()
 joined_ddf = feature_ddf.merge(label_ddf, on = "LOAN_SEQUENCE_NUMBER", how = "inner").compute()
-X = joined_ddf.drop("label", axis = 1)
-y = joined_ddf[["label"]]
+X = joined_ddf.drop("label", axis = 1).compute()
+y = joined_ddf[["label"]].compute()
 
 # train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)

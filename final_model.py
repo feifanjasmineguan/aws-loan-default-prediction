@@ -1,5 +1,6 @@
 """
-Final Model pandas version 
+Final Model pandas version: we compare the performance of 
+naive logistic regression with XGBClassifier 
 
 Author: Jasmine Guan and Sheng Yang
 """
